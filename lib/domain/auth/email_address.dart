@@ -1,68 +1,51 @@
-// import 'package:dartz/dartz.dart';
-// import 'package:flutter/foundation.dart';
-// import 'package:freezed_annotation/freezed_annotation.dart';
-// // ignore_for_file: public_member_api_docs, sort_constructors_first
-// class EmailAddress {
-//   final String value;
-//   final Either<Left, Rigth> failure;
+// ignore_for_file: public_member_api_docs, sort_constructors_first
+import 'package:dartz/dartz.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
 
-//   factory EmailAddress(String input){
-//     assert(input != null )
-//     return EmailAddress._(
-//       validateEmailAddress(input),
-//     );
-//   }
+part 'email_address.freezed.dart';
 
-//   EmailAddress._(this.value, this.failure);
-//   @override
-//   String toString() => 'EmailAddress(value: $value)';
+class EmailAddress {
+  final Either<ValueFailure<String>, String> value;
 
-//   @override
-//   bool operator ==(covariant EmailAddress other) {
-//     if (identical(this, other)) return true;
-  
-//     return 
-//       other.value == value;
-//   }
+  factory EmailAddress(String input) {
+    return EmailAddress._(
+      validateEmailAddress(input),
+    );
+  }
+  const EmailAddress._(this.value);
 
-//   @override
-//   int get hashCode => value.hashCode;
-  
+  @override
+  String toString() => 'EmailAddress(value: $value)';
 
-// }
+  @override
+  bool operator ==(covariant EmailAddress other) {
+    if (identical(this, other)) return true;
 
-//   String validateEmailAddress(String input){
-//     const emailRegex =
-//       r"""^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+""";
+    return other.value == value;
+  }
 
-//     if (RegExp(emailRegex).hasMatch(input)){
-//       return input;
-//     } else {
-//       throw InvalidEmailException(failedValue: input);
-//     }
-//   }
-//   @freezed
-//   abstract class ValueFailure<T> with _$ValueFailure<T>{
-//     const factory ValueFailure.invalidEmail({
-//       @required String failedValue, 
-//     }) = InvalidEmail<T>;
-//   }
+  @override
+  int get hashCode => value.hashCode;
+}
 
-//   abstract class Failure{
+Either<ValueFailure<String>, String> validateEmailAddress(String input) {
+  const emailRegex =
+      r"""^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+""";
+  if (RegExp(emailRegex).hasMatch(input)) {
+    return right(input);
+  } else {
+    return left(
+      ValueFailure.invalidEmail(failedValue: input),
+    );
+  }
+}
 
-    
-
-//   }
-  
-
-//   class InvalidEmailFailure implements Failure{
-//     final String failedValue;
-//     InvalidEmailFailure({@required this.failedValue})
-//   }
-
-//   class InvalidPassword implements Failure{
-//     final String failedValue;
-//     InvalidPassword({@required this.failedValue})
-//   }
-
-  
+@freezed
+abstract class ValueFailure<T> with _$ValueFailure<T> {
+  const factory ValueFailure.invalidEmail({
+    required String failedValue,
+  }) = InvalidEmail<T>;
+  const factory ValueFailure.shortPassword({
+    required String failedValue,
+  }) = InvalidEmail<T>;
+}
